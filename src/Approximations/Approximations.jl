@@ -8,6 +8,8 @@ module Approximations
 
 using LazySets, LazySets.Arrays, Requires, LinearAlgebra, SparseArrays
 
+import LazySets: isbounded
+
 export approximate,
        ballinf_approximation,
        box_approximation, interval_hull,
