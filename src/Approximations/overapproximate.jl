@@ -807,6 +807,74 @@ end
 end # quote
 end # load_taylormodels_overapproximation
 
+# =============================================
+# Functionality that requires IntervalMatrices
+# =============================================
+
+function load_intervalmatrices_overapproximation()
+return quote
+
+using .IntervalMatrices: AbstractIntervalMatrix, split
+
+"""
+    overapproximate(lm::LinearMap{N, Zonotope{N}, NM,
+                                  AbstractIntervalMatrix{NM}},
+                    ::Type{<:Zonotope})::Zonotope{N} where {N<:Real, NM}
+
+Overapproximate an interval-matrix linear map of a zonotope by a new zonotope.
+
+### Input
+
+- `lm`       -- interval-matrix linear map of a zonotope
+- `Zonotope` -- type for dispatch
+
+### Output
+
+A zonotope overapproximating the linear map.
+
+### Algorithm
+
+This function implements the method proposed in [1].
+
+Given an interval matrix ``M = \\tilde{M} + ⟨-\\hat{M},\\hat{M}⟩`` (split into a
+conventional matrix and a symmetric interval matrix) and a zonotope
+``⟨c, g_1, …, g_m⟩``, we compute the resulting zonotope
+``⟨\\tilde{M}c, \\tilde{M}g_1, …, \\tilde{M}g_m, v_1, …, v_n⟩`` where the
+``v_j``, ``j = 1, …, n``, are defined as
+
+```math
+    v_j = \\begin{cases} 0 & i ≠ j \\\\
+          \\hat{M}_j (|c| + \\sum_{k=1}^m |g_k|) & i = j. \\end{cases}
+```
+
+[1] Althoff, Stursberg, Buss. Reachability analysis of linear systems with
+uncertain parameters and inputs. CDC 2007.
+"""
+function overapproximate(lm::LinearMap{N, Zonotope{N}, NM,
+                                       AbstractIntervalMatrix{NM}},
+                         ::Type{<:Zonotope})::Zonotope{N} where {N<:Real, NM}
+    Mc, Ms = split(lm.M)
+    c = Mc * Z.c
+    n = dim(lm)
+    G = zeros(N, n, ngens(Z) + n)
+    vector_sum = abs.(c)
+    @inbounds for j in 1:ngens(Z)
+        g = @view Z.generators[:, j]
+        G[:, j] = Mc * g
+        vector_sum += g
+    end
+    j = ngens(Z)
+    M_r = right(M_sym)
+    @inbounds for i in 1:n
+        j += 1
+        row = @view Ms[i, :]
+        G[i, j] = row * vector_sum
+    end
+    return Zonotope(c, G)
+end
+
+end end  # quote / load_intervalmatrices_overapproximation()
+
 # ==========================================
 # Lazy linear maps of cartesian products
 # ==========================================
