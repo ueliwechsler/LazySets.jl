@@ -8,8 +8,6 @@ module Approximations
 
 using LazySets, LazySets.Arrays, Requires, LinearAlgebra, SparseArrays
 
-import LazySets: isbounded
-
 export approximate,
        ballinf_approximation,
        box_approximation, interval_hull,
@@ -21,7 +19,8 @@ export approximate,
        OctDirections,
        PolarDirections,
        SphericalDirections,
-       CustomDirections
+       CustomDirections,
+       isbounding
 
 const TOL(N::Type{Float64}) = eps(N)
 const TOL(N::Type{Float32}) = eps(N)
