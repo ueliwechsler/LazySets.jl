@@ -1391,14 +1391,17 @@ end
 
 # symmetric method
 function is_intersection_empty(P::HPolyhedron{N},
-                               X::CartesianProductArray{N, S}) where {N<:Real, S<:LazySet{N}}
+                               X::CartesianProductArray{N, S}
+                              ) where {N<:Real, S<:LazySet{N}}
         is_intersection_empty(X, P)
 end
 
 """
-    is_intersection_empty(X::CartesianProductArray{N}, Y::CartesianProductArray{N}) where {N}
+    is_intersection_empty(X::CartesianProductArray{N},
+                          Y::CartesianProductArray{N}) where {N<:Real}
 
-Check whether two Cartesian products of a finite number of convex sets do not intersect.
+Check whether two Cartesian products of a finite number of convex sets do not
+intersect.
 
 ### Input
 
@@ -1407,10 +1410,12 @@ Check whether two Cartesian products of a finite number of convex sets do not in
 
 ### Output
 
-`true` iff ``X ∩ Y = ∅ ``.
+`true` iff ``X ∩ Y = ∅``.
 """
-function is_intersection_empty(X::CartesianProductArray{N}, Y::CartesianProductArray{N}) where {N}
-    @assert same_block_structure(array(X), array(Y)) "block structure has to be the same"
+function is_intersection_empty(X::CartesianProductArray{N},
+                               Y::CartesianProductArray{N}) where {N<:Real}
+    @assert same_block_structure(array(X), array(Y)) "block structure has to " *
+        "be the same"
 
     for i in 1:length(X.array)
         if isdisjoint(X.array[i], Y.array[i])
@@ -1419,4 +1424,58 @@ function is_intersection_empty(X::CartesianProductArray{N}, Y::CartesianProductA
     end
 
     return false
+end
+
+"""
+    is_intersection_empty(cpa::CartesianProductArray{N},
+                          H::AbstractHyperrectangle{N}) where {N<:Real}
+
+Check whether a Cartesian products of a finite number of convex sets and a
+hyperrectangular set not intersect.
+
+### Input
+
+- `cpa`     -- Cartesian product of a finite number of convex sets
+- `H`       -- hyperrectangular set
+- `witness` -- (optional, default: `false`) compute a witness if activated
+
+### Output
+
+* If `witness` option is deactivated: `true` iff ``cpa ∩ H = ∅``
+* If `witness` option is activated:
+  * `(true, [])` iff ``cpa ∩ H = ∅``
+  * `(false, v)` iff ``cpa ∩ H ≠ ∅`` and ``v ∈ cpa ∩ H``
+"""
+function is_intersection_empty(cpa::CartesianProductArray{N},
+                               H::AbstractHyperrectangle{N},
+                               witness::Bool=false) where {N<:Real}
+    if witness
+        w = zeros(N, dim(H))
+    end
+    n = dim(H)
+    block_start = 1
+    for bi in array(cpa)
+        ni = dim(bi)
+        block = block_start:(block_start + ni - 1)
+        Hi = project(H, block, Hyperrectangle, n)
+        res = isdisjoint(bi, Hi, witness)
+        if witness
+            if res[1]
+                return (true, N[])
+            else
+                w[block] = res[2]
+            end
+        elseif res
+            return true
+        end
+        block_start += ni
+    end
+    return witness ? (false, w) : false
+end
+
+# symmetric method
+function is_intersection_empty(H::AbstractHyperrectangle{N},
+                               cpa::CartesianProductArray{N},
+                               witness::Bool=false) where {N<:Real}
+    return is_intersection_empty(cpa, H, witness)
 end
