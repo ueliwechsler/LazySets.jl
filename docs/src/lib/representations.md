@@ -48,6 +48,7 @@ radius_hyperrectangle(::BallInf{N}) where {N<:Real}
 radius_hyperrectangle(::BallInf{N}, ::Int) where {N<:Real}
 rand(::Type{BallInf})
 σ(::AbstractVector{N}, ::BallInf{N}) where {N<:Real}
+ρ(d::AbstractVector{N}, B::BallInf{N}) where {N<:Real}
 translate(::BallInf{N}, ::AbstractVector{N}) where {N<:Real}
 ```
 Inherited from [`LazySet`](@ref):
@@ -66,7 +67,6 @@ Inherited from [`AbstractZonotope`](@ref):
 * [`ngens`](@ref ngens(::AbstractZonotope))
 
 Inherited from [`AbstractHyperrectangle`](@ref):
-* [`ρ`](@ref ρ(::AbstractVector{N}, ::AbstractHyperrectangle{N}) where {N<:Real})
 * [`∈`](@ref ∈(::AbstractVector{N}, ::AbstractHyperrectangle{N}) where {N<:Real})
 * [`norm`](@ref norm(::AbstractHyperrectangle, ::Real))
 * [`vertices_list`](@ref vertices_list(::AbstractHyperrectangle{N}) where {N<:Real})
