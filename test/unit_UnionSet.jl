@@ -11,6 +11,14 @@ for N in [Float64, Rational{Int}, Float32]
     # array type (union of a finite number of convex sets)
     Uarr = UnionSetArray([B1, B2])
 
+    # neutral and absorbing elements
+    E = EmptySet{N}()
+    @test neutral(UnionSet) == neutral(UnionSetArray) == EmptySet
+    @test UnionSet(B1, E) == UnionSet(E, B1) == B1
+    U = Universe{N}(2)
+    @test absorbing(UnionSet) == absorbing(UnionSetArray) == Universe
+    @test UnionSet(B1, U) == UnionSet(U, B1) == U
+
     for U in [UXY, Uarr]
         # dimension
         @test dim(U) == dim(B1)
