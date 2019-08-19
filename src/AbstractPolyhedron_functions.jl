@@ -233,7 +233,7 @@ Concrete linear map of a polyhedron in constraint representation.
                 the matrix is invertible)
 - `use_inv`  -- (optional, default: `false` if `M` is sparse and `true`
                 otherwise) whether to compute the full left division through
-                `inv(M)`, or to use the left division for each vector; see below 
+                `inv(M)`, or to use the left division for each vector; see below
 
 ### Output
 
@@ -270,7 +270,7 @@ This function implements two algorithms for the linear map:
   then ``y = M x`` implies ``x = \\text{inv}(M) y`` and we transform the
   constraint system ``A x ≤ b`` to ``A \\text{inv}(M) y ≤ b``.
 - Otherwise, we transform the polyhedron to vertex representation and apply the map
-  to each vertex, returning a polyhedron in vertex representation. 
+  to each vertex, returning a polyhedron in vertex representation.
 
 Note that the vertex representation (second approach) is only available if the
 polyhedron is bounded. Hence we check boundedness first.

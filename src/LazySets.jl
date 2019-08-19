@@ -127,6 +127,7 @@ include("Parallel/Parallel.jl")
 # Plot recipes
 # ============
 include("plot_recipes.jl")
+include("plot_unbounded.jl")
 
 # ===================================================
 # Load external packages on-demand (using 'Requires')
